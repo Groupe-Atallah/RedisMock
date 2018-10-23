@@ -372,6 +372,19 @@ class RedisMock
         return $this->returnPipedInfo($result);
     }
 
+    public function sunionstore($key, $from_a, $from_b)
+    {
+        $values_a = [];
+        $values_b = [];
+        if (isset(self::$dataValues[$this->storage][$from_a])) {
+            $values_a = array_values(self::$dataValues[$this->storage][$from_a]);
+        }
+        if (isset(self::$dataValues[$this->storage][$from_b])) {
+            $values_b = array_values(self::$dataValues[$this->storage][$from_b]);
+        }
+        self::$dataValues[$this->storage][$key] = ($values_a + $values_b);
+    }
+
     public function scard($key)
     {
         // returns 0 if key not found
@@ -379,6 +392,38 @@ class RedisMock
             return $this->returnPipedInfo(0);
         }
         return $this->returnPipedInfo(count(self::$dataValues[$this->storage][$key]));
+    }
+
+    public function spop($key)
+    {
+        // Must exists and must be a set
+        if (!(isset(self::$dataValues[$this->storage][$key]) && self::$dataTypes[$this->storage][$key] === 'set')) {
+            return $this->returnPipedInfo(false);
+        }
+
+        if (isset(self::$dataValues[$this->storage][$key][0])) {
+            $element = array_shift(self::$dataValues[$this->storage][$key]);
+            return $this->returnPipedInfo($element);
+        } else {
+            return $this->returnPipedInfo(false);
+        }
+    }
+
+    public function smove($from, $to, $member)
+    {
+        $this->stopPipeline();
+
+        if ($this->srem($from, $member) == 0) {
+            return $this->returnPipedInfo(0);
+        }
+
+        if ($this->sadd($to, $member) == 0) {
+            return $this->returnPipedInfo(0);
+        }
+
+        $this->restorePipeline();
+
+        return $this->returnPipedInfo(1);
     }
 
     public function srem($key, $members)

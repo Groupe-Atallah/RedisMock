@@ -72,8 +72,11 @@ Redis command                                    | Description
 **SISMEMBER** *key* *member*                     | Determines if a member is in a set
 **SMEMBERS** *key*                               | Gets all the members in a set
 **SUNION** *key* *[key ...]*                     | Returns the members of the set resulting from the union of all the given sets.
+**SUNIONSTORE** *key* *[key ...]                 | Same as SUNION, but stores the result at *key* instead.
 **SINTER** *key* *[key ...]*                     | Returns the members of the set resulting from the intersection of all the given sets.
 **SCARD** *key*                                  | Get cardinality of set (count of members)
+**SPOP** *key* *[count]*                         | Removes and returns one or more random elements from the set at *key*.
+**SMOVE** *source* *destination* *member*        | Move *member* from the set at *source* to the set at *destination*.
 **SREM** *key* *member* *[member ...]*           | Removes one or more members from a set
 **TTL** *key*                                    | Gets the time to live for a key
 **TYPE** *key*                                   | Returns the string representation of the type of the value stored at key.
