@@ -178,6 +178,12 @@ class {{class}} extends \{{baseClass}}
 
         return $this->clientMock;
     }
+    
+    // Because it's uses pass by reference and call_user_func_array mixed with __call doesn't support this.
+    public function scan(&$iterator, $match = null, $count = null): array
+    {
+        return $this->getClientMock()->scan($iterator, $match, $count);
+    }
 
     public function __call($method, $args)
     {

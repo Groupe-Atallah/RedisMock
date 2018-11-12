@@ -1753,22 +1753,25 @@ class RedisMock extends test
         $redisMock->lpush('key12', 'value12');
 
         // It must return two values, start cursor after the first value of the list.
+        $iterator = 1;
         $this->assert
-            ->array($redisMock->scan(1, ['COUNT' => 2]))
-            ->isEqualTo([3, [0 => 'yourKey', 1 => 'ourKi']]);
+            ->array($redisMock->scan($iterator, '*', 2))
+            ->isEqualTo([0 => 'yourKey', 1 => 'ourKi']);
 
 
         // It must return all the values with match with the regex 'our' (2 keys).
         // And the cursor is defined after the default count (10) => the match has not terminate all the list.
+        $iterator = 0;
         $this->assert
-            ->array($redisMock->scan(0, ['MATCH' => '*our*']))
-            ->isEqualTo([10, [0 => 'yourKey', 1 => 'ourKi']]);
+            ->array($redisMock->scan($iterator, '*our*'))
+            ->isEqualTo([0 => 'yourKey', 1 => 'ourKi']);
 
         // Execute the match at the end of this list, the match not return an element (no one element match with the regex),
         // And the list is terminate, return the cursor to the start (0)
+        $iterator = 10;
         $this->assert
-            ->array($redisMock->scan(10, ['MATCH' => '*our*']))
-            ->isEqualTo([0, []]);
+            ->array($redisMock->scan($iterator, '*our*'))
+            ->isEqualTo([]);
 
     }
 }

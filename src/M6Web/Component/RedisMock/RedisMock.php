@@ -1180,17 +1180,19 @@ class RedisMock
     /**
      * Mock the `scan` command
      * @see https://redis.io/commands/scan
-     * @param int $cursor
-     * @param array $options contain options of the command, with values (ex ['MATCH' => 'st*', 'COUNT' => 42] )
+     * @param int $iterator Iterator, usually starts at 0 or null.
+     * @param string $match Optional pattern to match against, otherwise '*' for everything.
+     * @param int $count Optional key count to obtain, otherwise 10.
      *
      * @return array
      */
-    public function scan($cursor = 0, array $options = []): array
+    public function scan(&$iterator, $match = null, $count = null): array
     {
         // Define default options
-        $match = isset($options['MATCH']) ? $options['MATCH'] : '*';
-        $count = isset($options['COUNT']) ? $options['COUNT'] : 10;
-        $maximumValue = $cursor + $count -1;
+        $iterator = $iterator !== null ? $iterator : 0;
+        $match = $match !== null ? $match : '*';
+        $count = $count !== null ? $count : 10;
+        $maximumValue = $iterator + $count - 1;
 
         // List of all keys in the storage (already ordered by index).
         $keysArray = array_keys(self::$dataValues[$this->storage]);
@@ -1203,7 +1205,7 @@ class RedisMock
         // Pattern, for find matched values.
         $pattern =  str_replace('*', '.*', sprintf('/^%s/', $match));
 
-        for($i = $cursor; $i <= $maximumValue; $i++)
+        for($i = $iterator; $i <= $maximumValue; $i++)
         {
             if (isset($keysArray[$i])){
                 $nextCursorPosition = $i >= $maximumListElement ? 0 : $i + 1;
@@ -1218,7 +1220,8 @@ class RedisMock
             }
         }
 
-        return [$nextCursorPosition, $values];
+        $iterator = $nextCursorPosition;
+        return $values;
     }
 
     /**
