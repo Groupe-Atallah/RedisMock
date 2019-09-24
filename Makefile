@@ -6,4 +6,4 @@ build:
 	docker build -t redismock .
 
 test:
-	docker run redismock vendor/bin/atoum
+	docker run --rm redismock vendor/bin/atoum
