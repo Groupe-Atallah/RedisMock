@@ -1771,4 +1771,12 @@ class RedisMock extends test
             ->isEqualTo([0, []]);
 
     }
+
+    public function testWatch()
+    {
+        $redisMock = new Redis();
+        $this->assert
+            ->string($redisMock->watch('key'))
+            ->isEqualTo('OK');
+    }
 }

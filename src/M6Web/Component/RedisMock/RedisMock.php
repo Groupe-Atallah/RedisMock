@@ -972,6 +972,10 @@ class RedisMock
         return $this->zrangebyscoreHelper($key, $min, $max, $options, true);
     }
 
+    public function watch($key) {
+        return 'OK';
+    }
+
 
     public function zadd($key, $score, $member) {
         if (func_num_args() > 3) {
